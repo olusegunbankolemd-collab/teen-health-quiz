@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Health Check Quiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Quicksand:wght@500;600;700&display=swap">
+<style>
+/* Layout: one centered question card at a time on the talk's soft-blue ground, coral True / sky False buttons, score screen at the end */
+:root{
+  --bg:#E3EDFD; --card:#FFFFFF; --ink:#3D4470; --muted:#6A7099;
+  --coral:#F08484; --coral-ink:#FFFFFF; --sky:#B7E0F0; --peri:#8EA3D6;
+  --good:#2E8B6A; --good-bg:#E2F5EC; --bad:#C2484B; --bad-bg:#FDE8E8;
+  --display:"Lilita One","Arial Rounded MT Bold",system-ui,sans-serif;
+  --body:"Quicksand","Segoe UI",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#1B2040; --card:#262C55; --ink:#E7ECFF; --muted:#AEB5DA;
+  --coral:#F08484; --coral-ink:#1B2040; --sky:#3E6F86; --peri:#8EA3D6;
+  --good:#7FD8B2; --good-bg:#1F3D39; --bad:#FF9EA0; --bad-bg:#47273A; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#1B2040; --card:#262C55; --ink:#E7ECFF; --muted:#AEB5DA;
+  --coral:#F08484; --coral-ink:#1B2040; --sky:#3E6F86; --peri:#8EA3D6;
+  --good:#7FD8B2; --good-bg:#1F3D39; --bad:#FF9EA0; --bad-bg:#47273A; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 40px}
+.wrap{max-width:620px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+header{text-align:center;display:flex;flex-direction:column;gap:6px}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(2rem,7vw,2.8rem);line-height:1.05;margin:0;text-wrap:balance;letter-spacing:.5px}
+.sub{color:var(--muted);font-weight:600;margin:0}
+.progress{display:flex;gap:6px;justify-content:center}
+.dot{width:22px;height:8px;border-radius:4px;background:var(--sky)}
+.dot.done{background:var(--peri)}.dot.now{background:var(--coral)}
+.card{background:var(--card);border-radius:22px;padding:28px 24px;display:flex;flex-direction:column;gap:18px;box-shadow:0 6px 0 rgba(61,68,112,.08)}
+.qnum{font-weight:700;text-transform:uppercase;letter-spacing:.12em;font-size:.78rem;color:var(--muted)}
+.q{font-size:1.3rem;font-weight:700;margin:0;text-wrap:balance}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+button{font:inherit;cursor:pointer;border:0;border-radius:999px;padding:14px 18px;font-family:var(--display);font-size:1.35rem;letter-spacing:.5px}
+button:focus-visible{outline:3px solid var(--peri);outline-offset:3px}
+.t{background:var(--coral);color:var(--coral-ink)}
+.f{background:var(--sky);color:var(--ink)}
+button:disabled{opacity:.45;cursor:default}
+button.picked{opacity:1;box-shadow:0 0 0 3px var(--ink)}
+.fb{border-radius:16px;padding:14px 16px;font-weight:600}
+.fb.ok{background:var(--good-bg);color:var(--good)}.fb.no{background:var(--bad-bg);color:var(--bad)}
+.fb b{display:block;font-family:var(--display);font-weight:400;font-size:1.2rem;letter-spacing:.3px}
+.fb span{color:var(--ink);font-weight:500}
+.next{background:var(--ink);color:var(--bg);justify-self:end;font-size:1.15rem;padding:12px 26px}
+.score{font-family:var(--display);font-size:4rem;line-height:1;margin:0;text-align:center}
+.msg{text-align:center;font-weight:600;margin:0}
+.help{background:var(--bg);border-radius:16px;padding:14px 16px;font-weight:600;font-size:.95rem}
+.help strong{color:var(--coral)}
+footer{text-align:center;color:var(--muted);font-size:.85rem;font-weight:600}
+@media (prefers-reduced-motion:no-preference){.card{animation:pop .25s ease-out}@keyframes pop{from{transform:translateY(6px)}to{transform:none}}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <h1>Health Check Quiz</h1>
+    <p class="sub">Mental health &amp; hygiene · 10 true or false questions</p>
+  </header>
+  <div class="progress" id="progress" aria-hidden="true"></div>
+  <main id="stage" aria-live="polite"></main>
+  <footer>Olusegun Bankole MD · Taking Charge of Your Health</footer>
+</div>
+
+<script>
+const Q=[
+ {q:"Teenagers need about 8 to 10 hours of sleep each night.",a:true,e:"Your brain and body do a lot of growing and repairing while you sleep. Most teens get less than they need."},
+ {q:"Feeling sad, stressed or worried sometimes means something is seriously wrong with you.",a:false,e:"Everyone has hard days. If the feelings last for weeks or get in the way of school, sleep or friends, talk to someone you trust."},
+ {q:"Asking for help with your feelings is a sign of weakness.",a:false,e:"Reaching out to a parent, counselor, coach or doctor takes strength. It is one of the most powerful self-care steps."},
+ {q:"Using your phone right before bed can make it harder to fall asleep.",a:true,e:"Screen light and scrolling keep your brain alert. Try screens off about 30 minutes before bed."},
+ {q:"Social media usually shows a realistic picture of people's everyday lives.",a:false,e:"Posts are filtered, edited and chosen. Social media is not real life, so don't measure your worth against it."},
+ {q:"Brushing your teeth once a day is enough to keep them healthy.",a:false,e:"Brush twice a day, floss daily, and see the dentist every 6 months."},
+ {q:"Acne happens because a person is dirty.",a:false,e:"Puberty hormones make skin oilier, so acne is normal. Wash gently twice a day and don't pick or squeeze pimples."},
+ {q:"Regular physical activity can lower stress and improve your mood.",a:true,e:"Exercise releases feel-good chemicals. Aim for 60 minutes of activity most days."},
+ {q:"Washing your hands with soap for at least 20 seconds helps stop germs from spreading.",a:true,e:"Wash before eating, after the bathroom and after sports. It's one of the simplest ways to avoid getting sick."},
+ {q:"In the U.S., you can call or text 988 any time if you or a friend are in crisis.",a:true,e:"988 is the Suicide & Crisis Lifeline: free, confidential, 24/7, by call, text or chat."}
+];
+let i=0,score=0,answered=false;
+const stage=document.getElementById('stage'),prog=document.getElementById('progress');
+function dots(){prog.innerHTML=Q.map((_,k)=>`<span class="dot ${k<i?'done':k===i?'now':''}"></span>`).join('')}
+function show(){
+  answered=false;dots();
+  const x=Q[i];
+  stage.innerHTML=`<section class="card">
+    <div class="qnum">Question ${i+1} of ${Q.length}</div>
+    <p class="q">${x.q}</p>
+    <div class="btns"><button class="t" id="btn-true">True</button><button class="f" id="btn-false">False</button></div>
+    <div id="fbslot"></div></section>`;
+  document.getElementById('btn-true').onclick=()=>pick(true);
+  document.getElementById('btn-false').onclick=()=>pick(false);
+}
+function pick(v){
+  if(answered)return;answered=true;
+  const x=Q[i],ok=v===x.a;if(ok)score++;
+  const bt=document.getElementById('btn-true'),bf=document.getElementById('btn-false');
+  bt.disabled=bf.disabled=true;(v?bt:bf).classList.add('picked');
+  document.getElementById('fbslot').outerHTML=`<div class="fb ${ok?'ok':'no'}"><b>${ok?'Correct!':'Not quite.'} The answer is ${x.a?'True':'False'}.</b><span>${x.e}</span></div>
+    <button class="next" id="btn-next">${i<Q.length-1?'Next question':'See my score'}</button>`;
+  const n=document.getElementById('btn-next');n.onclick=()=>{i++;i<Q.length?show():done()};n.focus();
+}
+function done(){
+  prog.innerHTML=Q.map(()=>'<span class="dot done"></span>').join('');
+  const m=score>=9?"Health pro! You really know your stuff.":score>=7?"Great job! You're on the right track.":score>=5?"Good start. Check the answers you missed.":"Keep learning. Ask questions, that's how we grow.";
+  stage.innerHTML=`<section class="card">
+    <div class="qnum" style="text-align:center">Your score</div>
+    <p class="score">${score} / ${Q.length}</p>
+    <p class="msg">${m}</p>
+    <div class="help">Need to talk? Call or text <strong>988</strong> any time. NYC teens 13–17 can also get free online therapy through <strong>NYC Teenspace</strong> (nyc.gov/teenspace).</div>
+    <button class="next" id="btn-again" style="justify-self:center">Try again</button></section>`;
+  document.getElementById('btn-again').onclick=()=>{i=0;score=0;show()};
+}
+show();
+</script>
+</body>
+</html>
