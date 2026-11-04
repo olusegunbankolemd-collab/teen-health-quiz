@@ -159,33 +159,34 @@ const MYTH=[
  {t:"Talking about your feelings just makes them worse.",f:false,e:"Sharing with someone you trust usually makes hard feelings lighter."},
  {t:"Everyone goes through puberty at the same age.",f:false,e:"Everyone’s timing is different. It’s not a race."},
  {t:"Box breathing can calm your body in under a minute.",f:true,e:"In 4, hold 4, out 4, hold 4. Try it before a test."},
- {t:"Social media shows what people’s lives are really like.",f:false,e:"Posts are filtered, edited and picked. It’s a highlight reel."}
+ {t:"Social media shows what people’s lives are really like.",f:false,e:"Posts are filtered, edited and picked. It’s a highlight reel."},
+ {t:"Washing your hands for 20 seconds removes more germs than a quick rinse.",f:true,e:"Soap needs time to work. Hum Happy Birthday twice."}
 ];
 const SCEN=[
  {img:"img/deodorant.jpg",alt:"Teen putting on deodorant",t:"Basketball practice just ended. You’re heading straight out to hang with friends.",o:[
-  {t:"Quick shower or wipe-down, fresh shirt, deodorant",s:2,e:"Clean and confident. That’s a mental health win too."},
-  {t:"Spray extra body spray over the sweat",s:1,e:"Covering the smell doesn’t remove the bacteria causing it."},
-  {t:"Go as you are. Nobody will notice",s:0,e:"They probably will. A 5-minute refresh makes a big difference."}]},
+  {t:"Quick shower, clean shirt, deodorant, then go",s:2,e:"Clean and confident. Feeling fresh is a mood boost too."},
+  {t:"Cover it with lots of body spray, then head out",s:1,e:"Covering the smell doesn’t remove the bacteria causing it. A quick shower does."},
+  {t:"Go as you are, since your friends played too",s:0,e:"Sweat plus bacteria builds up fast. A 5-minute refresh makes a big difference."}]},
  {img:"img/screensoff.jpg",alt:"Teen winding down with screens off before bed",t:"It’s midnight. You have a test tomorrow and you’re still scrolling.",o:[
-  {t:"Put the phone across the room and go to sleep",s:2,e:"Sleep is when your brain saves what you studied."},
-  {t:"Watch one more video, then sleep",s:1,e:"“One more” usually turns into ten."},
-  {t:"Grab an energy drink and cram until 3 a.m.",s:0,e:"Less sleep means worse focus and memory on test day."}]},
+  {t:"Put the phone across the room and sleep",s:2,e:"Sleep is when your brain saves what you studied."},
+  {t:"Watch one more video, then put it down",s:1,e:"“One more” usually turns into ten. Put it out of reach instead."},
+  {t:"Drink an energy drink and study until 3 a.m.",s:0,e:"Less sleep means worse focus and memory on test day."}]},
  {img:"img/socialmedia.jpg",alt:"Teen looking at social media on a phone",t:"Your group chat starts posting mean memes about a classmate.",o:[
-  {t:"Don’t join in, screenshot it, and tell a trusted adult or report it",s:2,e:"Standing up quietly still counts. Check in on your classmate too."},
-  {t:"Leave the chat without saying anything",s:1,e:"Better than joining, but the bullying keeps going."},
-  {t:"Send a laughing reaction so you fit in",s:0,e:"Cyberbullying is never okay, even as a joke."}]},
+  {t:"Mute the chat and act like you didn’t see it",s:1,e:"Better than joining, but the bullying keeps going. Screenshot it and tell a trusted adult."},
+  {t:"Don’t join in, screenshot it, tell an adult",s:2,e:"Standing up quietly still counts. Check in on your classmate too."},
+  {t:"React with a laugh so you don’t stand out",s:0,e:"Cyberbullying is never okay, even as a joke."}]},
  {img:"img/feelings.jpg",alt:"Comic of a teen feeling jealous, then talking to a friend",t:"You see your best friend hanging out with a new group, and you feel jealous.",o:[
-  {t:"Notice the feeling and talk to your friend about it calmly",s:2,e:"Naming the feeling takes away a lot of its power."},
-  {t:"Vent to another friend you trust",s:1,e:"Talking helps. Try talking to your best friend too."},
-  {t:"Post a vague, shady story about them",s:0,e:"That usually makes things worse for everyone."}]},
+  {t:"Vent about it to a different friend you trust",s:1,e:"Talking helps. Try talking to your best friend too."},
+  {t:"Post a vague, shady story about them tonight",s:0,e:"That usually makes things worse for everyone."},
+  {t:"Tell your friend calmly how you’ve been feeling",s:2,e:"Naming the feeling takes away a lot of its power."}]},
  {img:null,t:"At a party, someone hands you a vape and says, “Everyone’s doing it.”",o:[
-  {t:"“I’m good, thanks,” and change the subject or step away",s:2,e:"A clear, easy no. You don’t owe anyone a reason."},
-  {t:"Take it but don’t actually use it",s:1,e:"Holding it often leads to more pressure. A clear no is easier."},
-  {t:"Try it so they stop asking",s:0,e:"Nicotine is addictive, and real friends don’t push."}]},
+  {t:"Hold it so they stop asking, but don’t use it",s:1,e:"Holding it often leads to more pressure. A clear “I’m good, thanks” is easier."},
+  {t:"Say “I’m good, thanks” and walk away",s:2,e:"A clear, easy no. You don’t owe anyone a reason."},
+  {t:"Try one puff so you fit in with the group",s:0,e:"Nicotine is addictive, and real friends don’t push."}]},
  {img:"img/diversity.jpg",alt:"People holding hands around a heart",t:"A friend texts you: “I can’t do this anymore. Nobody would even care.”",o:[
-  {t:"Tell them you care, stay with them, and get a trusted adult or call or text 988 together",s:2,e:"Exactly right. You don’t have to handle it alone."},
-  {t:"Tell them to cheer up and that things will be fine",s:1,e:"Kind, but they need real support. Bring in a trusted adult or 988."},
-  {t:"Keep it secret because they asked you to",s:0,e:"Their safety matters more than a secret. Tell a trusted adult right away."}]}
+  {t:"Keep it secret because they asked you to",s:0,e:"Their safety matters more than a secret. Tell a trusted adult right away."},
+  {t:"Tell them to cheer up, it’ll all be fine",s:1,e:"Kind, but they need real support. Stay with them and bring in a trusted adult or 988."},
+  {t:"Say you care and get an adult or 988 now",s:2,e:"Exactly right. Stay with them. You don’t have to handle it alone."}]}
 ];
 const ROUNDS=[
  {key:"sort",name:"Habit Sort",img:"img/facewash.jpg",alt:"Teen washing his face",desc:"Is it a healthy habit or not? Tap fast. Quicker answers score more.",n:10,sec:8},
@@ -198,6 +199,27 @@ const URL_SHARE="https://olusegunbankolemd-collab.github.io/teen-health-quiz/gam
 let S={};
 const $=id=>document.getElementById(id);
 const stage=$('stage');
+/* Shuffle so the answers never form a pattern: no more than 2 of the same answer in a row */
+function mix(arr,key,maxRun=2){
+  let best=arr.slice();
+  for(let t=0;t<500;t++){
+    const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}
+    let run=1,ok=true;for(let i=1;i<a.length;i++){run=key(a[i])===key(a[i-1])?run+1:1;if(run>maxRun){ok=false;break}}
+    best=a;if(ok)break;
+  }
+  return best;
+}
+/* Balanced pick: equal healthy/unhealthy (or fact/myth), no long runs; best scenario answer spread across positions */
+function pickBalanced(list,key,n){
+  const yes=shuffle(list.filter(key)),no=shuffle(list.filter(x=>!key(x)));
+  const ny=Math.random()<.5?Math.floor(n/2):Math.ceil(n/2);
+  return mix(yes.slice(0,ny).concat(no.slice(0,n-ny)),key);
+}
+function buildScen(){
+  const scen=shuffle(SCEN);
+  const pos=mix(scen.map((_,k)=>k%3),p=>p);   // best answer lands in each slot twice, never 3 in a row
+  return scen.map((sc,k)=>{const others=shuffle(sc.o.filter(o=>o.s!==2)),o=others.slice();o.splice(pos[k],0,sc.o.find(x=>x.s===2));return {...sc,o}});
+}
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
 const calm=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
 const toTop=()=>window.scrollTo(0,0);
@@ -290,7 +312,7 @@ function startScreen(){
   </section>`;
   $('btn-start').onclick=()=>{
     S={nick:($('nick').value||'').trim().slice(0,16),score:0,streak:0,best:0,acc:0,total:0,right:0,round:0,
-       q:{sort:shuffle(SORT).slice(0,ROUNDS[0].n),myth:shuffle(MYTH).slice(0,ROUNDS[1].n),scen:SCEN.map(s=>({...s,o:shuffle(s.o)}))}};
+       q:{sort:pickBalanced(SORT,x=>x.h,ROUNDS[0].n),myth:pickBalanced(MYTH,x=>x.f,ROUNDS[1].n),scen:buildScen()}};
     beep('good');$('bar').hidden=false;hud();roundIntro();
   };
 }
