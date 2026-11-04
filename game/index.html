@@ -1,0 +1,442 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Level Up: Health Challenge</title>
+<meta name="description" content="A three-round health game for teens: sort the habits, bust the myths, and make the call.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Quicksand:wght@500;600;700&display=swap">
+<style>
+/* Layout: phone-first game card under a sticky score bar; navy arcade start screen; the talk's soft blue, coral and navy */
+:root{
+  --bg:#E3EDFD; --card:#FFFFFF; --ink:#3D4470; --muted:#5F6694; --navy:#3D4470; --on-navy:#F6F9FF;
+  --coral:#F08484; --coral-deep:#D45F5F; --sky:#B7E0F0; --peri:#8EA3D6; --gold:#F6B93B;
+  --good:#2E8B6A; --good-bg:#E2F5EC; --bad:#C2484B; --bad-bg:#FDE8E8; --mid:#9A6A00; --mid-bg:#FFF3D6;
+  --display:"Lilita One","Arial Rounded MT Bold","Trebuchet MS",sans-serif;
+  --body:"Quicksand","Segoe UI",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#1B2040; --card:#262C55; --ink:#E7ECFF; --muted:#AEB5DA; --navy:#121633; --on-navy:#F6F9FF;
+  --sky:#3E6F86; --good:#7FD8B2; --good-bg:#1F3D39; --bad:#FF9EA0; --bad-bg:#47273A; --mid:#FFD27A; --mid-bg:#45391F; color-scheme:dark}}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.45;min-height:100vh;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 32px;
+  -webkit-tap-highlight-color:transparent}
+.wrap{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+.bar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:10px;padding:12px 0 10px;background:var(--bg)}
+.bar .round{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:700;font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);flex:1;min-width:0}
+.pill{font-family:var(--display);font-size:1.1rem;letter-spacing:.3px;padding:6px 14px;border-radius:999px;background:var(--card);white-space:nowrap;font-variant-numeric:tabular-nums}
+.pill.streak{background:var(--coral);color:#fff}
+.pill.streak[hidden]{display:none}
+.icon-btn{border:0;background:var(--card);color:var(--ink);width:40px;height:40px;border-radius:50%;font:700 .8rem var(--body);cursor:pointer;flex:none}
+.icon-btn:focus-visible,button:focus-visible{outline:3px solid var(--peri);outline-offset:3px}
+.card{background:var(--card);border-radius:24px;padding:24px 22px;display:flex;flex-direction:column;gap:16px;position:relative;box-shadow:0 6px 0 rgba(61,68,112,.08);overflow:hidden}
+.card.navy{background:var(--navy);color:var(--on-navy)}
+h1,h2{font-family:var(--display);font-weight:400;margin:0;line-height:1.02;letter-spacing:.5px;text-wrap:balance}
+h1{font-size:clamp(2.6rem,12vw,3.6rem)}
+h2{font-size:clamp(1.8rem,8vw,2.4rem)}
+.eyebrow{margin:0;font-weight:700;font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;color:var(--coral)}
+p{margin:0}
+.lead{font-size:1.08rem;font-weight:600}
+.muted{color:var(--muted)}
+.navy .muted{color:#C9D3F2}
+.hero-img{width:100%;aspect-ratio:16/10;object-fit:cover;border-radius:18px;max-width:100%;display:block}
+.rounds{display:flex;flex-direction:column;gap:10px;margin:0;padding:0;list-style:none}
+.rounds li{display:flex;align-items:center;gap:12px;font-weight:600}
+.rounds .n{font-family:var(--display);width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--coral);color:#fff;flex:none}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-weight:700;font-size:.9rem}
+.field input{font:600 1.05rem var(--body);padding:12px 16px;border-radius:14px;border:2px solid var(--peri);background:var(--on-navy);color:#3D4470}
+button{font:inherit;cursor:pointer;border:0}
+.big{font-family:var(--display);font-size:1.4rem;letter-spacing:.5px;padding:16px 22px;border-radius:999px;background:var(--coral);color:#fff;box-shadow:0 5px 0 var(--coral-deep);transition:transform .08s}
+.big:active{transform:translateY(3px);box-shadow:0 2px 0 var(--coral-deep)}
+.big.alt{background:var(--ink);color:var(--bg);box-shadow:0 5px 0 rgba(0,0,0,.25)}
+.timer{height:10px;border-radius:5px;background:var(--bg);overflow:hidden}
+.timer i{display:block;height:100%;width:100%;background:var(--coral);transform-origin:left;border-radius:5px}
+.timer.low i{background:var(--bad)}
+.qmeta{display:flex;justify-content:space-between;font-weight:700;font-size:.8rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.prompt{font-size:1.35rem;font-weight:700;line-height:1.3;text-wrap:balance}
+.habit{font-family:var(--display);font-weight:400;font-size:clamp(1.6rem,7vw,2.1rem);line-height:1.12;text-align:center;padding:28px 10px;border-radius:20px;background:var(--bg);text-wrap:balance}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.choice{font-family:var(--display);font-size:1.25rem;padding:18px 10px;border-radius:20px;letter-spacing:.3px;line-height:1.1;transition:transform .08s,opacity .2s}
+.choice:active{transform:scale(.97)}
+.choice.yes{background:var(--good-bg);color:var(--good);box-shadow:inset 0 0 0 3px var(--good)}
+.choice.no{background:var(--bad-bg);color:var(--bad);box-shadow:inset 0 0 0 3px var(--bad)}
+.choice small{display:block;font-family:var(--body);font-weight:700;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;opacity:.8;margin-top:4px}
+.choice:disabled{cursor:default;opacity:.35}
+.choice.picked{opacity:1}
+.opts{display:flex;flex-direction:column;gap:10px}
+.opt{text-align:left;font:700 1rem/1.35 var(--body);padding:14px 16px;border-radius:16px;background:var(--bg);color:var(--ink);box-shadow:inset 0 0 0 2px transparent;transition:box-shadow .15s,opacity .2s}
+.opt:hover:not(:disabled){box-shadow:inset 0 0 0 2px var(--peri)}
+.opt:disabled{cursor:default;opacity:.45}
+.opt.s2{background:var(--good-bg);color:var(--good);opacity:1}
+.opt.s1{background:var(--mid-bg);color:var(--mid);opacity:1}
+.opt.s0.picked{background:var(--bad-bg);color:var(--bad);opacity:1}
+.fb{border-radius:16px;padding:14px 16px;font-weight:600;display:flex;flex-direction:column;gap:4px}
+.fb b{font-family:var(--display);font-weight:400;font-size:1.25rem;letter-spacing:.3px}
+.fb span{color:var(--ink);font-weight:500}
+.fb.ok{background:var(--good-bg);color:var(--good)}
+.fb.mid{background:var(--mid-bg);color:var(--mid)}
+.fb.no{background:var(--bad-bg);color:var(--bad)}
+.next{align-self:flex-end;font-family:var(--display);font-size:1.15rem;padding:12px 26px;border-radius:999px;background:var(--ink);color:var(--bg)}
+.scen-img{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:16px;max-width:100%;display:block}
+.float{position:absolute;right:22px;top:58px;font-family:var(--display);font-size:2rem;color:var(--good);pointer-events:none;z-index:6}
+.burst{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);pointer-events:none;z-index:5;font-family:var(--display);
+  font-size:clamp(2.4rem,11vw,3.6rem);line-height:1;padding:12px 26px;border-radius:999px;white-space:nowrap;opacity:0}
+.burst.good{color:var(--good);background:var(--good-bg)}
+.burst.bad{color:var(--bad);background:var(--bad-bg)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.stat{background:var(--bg);border-radius:16px;padding:12px 8px;text-align:center;display:flex;flex-direction:column;gap:2px}
+.stat b{font-family:var(--display);font-weight:400;font-size:1.6rem;line-height:1;font-variant-numeric:tabular-nums}
+.stat span{font-size:.75rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.rank{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}
+.rank svg{width:min(170px,50vw);height:auto;overflow:visible}
+.final-score{font-family:var(--display);font-size:clamp(3rem,15vw,4.2rem);line-height:1;font-variant-numeric:tabular-nums}
+.help{background:var(--bg);border-radius:16px;padding:14px 16px;font-weight:600;font-size:.95rem}
+.help strong{color:var(--coral-deep)}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.row>*{flex:1 1 180px}
+.toast{min-height:1.4em;text-align:center;font-weight:700;color:var(--good);font-size:.9rem}
+footer{text-align:center;color:var(--muted);font-size:.8rem;font-weight:600}
+#confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:50}
+@media (prefers-reduced-motion:no-preference){
+  .card{animation:pop .3s cubic-bezier(.2,1.4,.4,1)}
+  @keyframes pop{from{transform:translateY(10px) scale(.98);opacity:.4}to{transform:none;opacity:1}}
+  .float{animation:floatup 1s ease-out forwards}
+  @keyframes floatup{from{opacity:0;transform:translateY(10px) scale(.8)}20%{opacity:1;transform:translateY(0) scale(1.15)}to{opacity:0;transform:translateY(-40px)}}
+  .burst.go{animation:burst 1.1s cubic-bezier(.2,1.4,.4,1) forwards}
+  @keyframes burst{0%{opacity:0;transform:translate(-50%,-50%) scale(.3) rotate(-10deg)}20%{opacity:1;transform:translate(-50%,-50%) scale(1.12) rotate(3deg)}35%{transform:translate(-50%,-50%) scale(1)}75%{opacity:1}100%{opacity:0;transform:translate(-50%,-65%)}}
+  .shake{animation:shake .4s}
+  @keyframes shake{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+  .pill.bump{animation:bump .35s}
+  @keyframes bump{50%{transform:scale(1.2)}}
+  .rank svg{animation:rise .9s cubic-bezier(.2,1.5,.4,1) both,bob 2.6s ease-in-out .9s infinite}
+  @keyframes rise{from{opacity:0;transform:translateY(40px) scale(.6)}to{opacity:1;transform:none}}
+  @keyframes bob{50%{transform:translateY(-8px) rotate(-2deg)}}
+  .spark{animation:twinkle 1.6s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+  .spark.s2{animation-delay:.5s}.spark.s3{animation-delay:1s}
+  @keyframes twinkle{0%,100%{opacity:.2;transform:scale(.6)}50%{opacity:1;transform:scale(1.1)}}
+}
+@media (prefers-reduced-motion:reduce){.burst.go,.float{opacity:1;animation:hide 1s steps(1,end) forwards}@keyframes hide{to{opacity:0}}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="bar" id="bar" hidden>
+    <span class="round" id="roundLabel">Round 1</span>
+    <span class="pill streak" id="streakPill" hidden>Streak ×3</span>
+    <span class="pill" id="scorePill" aria-live="polite">0</span>
+    <button class="icon-btn" id="soundBtn" aria-label="Sound on" title="Sound">♪</button>
+  </div>
+  <main id="stage" aria-live="polite"></main>
+  <footer>Olusegun Bankole MD · Taking Charge of Your Health · Need to talk? Call or text 988</footer>
+</div>
+<canvas id="confetti" aria-hidden="true"></canvas>
+
+<script>
+/* ---------- Content (from the talk's slides) ---------- */
+const SORT=[
+ {t:"Charging your phone across the room at night",h:true,tip:"Out of reach means better sleep."},
+ {t:"Scrolling in bed until 2 a.m.",h:false,tip:"Late screens keep your brain wired. Teens need 8–10 hours."},
+ {t:"Sharing a razor with a friend",h:false,tip:"Razors spread germs and infections. Never share."},
+ {t:"Brushing twice a day and flossing",h:true,tip:"Plus a dentist visit every 6 months."},
+ {t:"Popping your pimples",h:false,tip:"Squeezing can cause scars and infection."},
+ {t:"60 minutes of movement most days",h:true,tip:"Exercise boosts mood and lowers stress."},
+ {t:"An energy drink at 9 p.m.",h:false,tip:"Late caffeine wrecks your sleep."},
+ {t:"Unfollowing accounts that make you feel bad",h:true,tip:"Protect your feed, protect your mood."},
+ {t:"Wearing yesterday’s gym socks again",h:false,tip:"Fresh socks every day keep feet healthy."},
+ {t:"Telling a trusted adult when you’re struggling",h:true,tip:"Asking for help takes strength."},
+ {t:"Washing hands for 20 seconds before eating",h:true,tip:"About two rounds of Happy Birthday."},
+ {t:"Keeping your feelings bottled up for weeks",h:false,tip:"Talk to someone. Feelings get lighter when shared."}
+];
+const MYTH=[
+ {t:"Acne means you’re not washing your face.",f:false,e:"Puberty hormones make skin oily. Acne is normal, not a sign of being dirty."},
+ {t:"Your brain keeps developing until your mid-20s.",f:true,e:"That’s why alcohol, vaping and drugs can hit teens harder."},
+ {t:"Vapes are basically just flavored water vapor.",f:false,e:"Most contain nicotine, which is addictive, plus other chemicals."},
+ {t:"Sweat itself doesn’t smell. Bacteria on your skin cause body odor.",f:true,e:"Daily showers and deodorant keep the bacteria in check."},
+ {t:"Talking about your feelings just makes them worse.",f:false,e:"Sharing with someone you trust usually makes hard feelings lighter."},
+ {t:"Everyone goes through puberty at the same age.",f:false,e:"Everyone’s timing is different. It’s not a race."},
+ {t:"Box breathing can calm your body in under a minute.",f:true,e:"In 4, hold 4, out 4, hold 4. Try it before a test."},
+ {t:"Social media shows what people’s lives are really like.",f:false,e:"Posts are filtered, edited and picked. It’s a highlight reel."}
+];
+const SCEN=[
+ {img:"img/deodorant.jpg",alt:"Teen putting on deodorant",t:"Basketball practice just ended. You’re heading straight out to hang with friends.",o:[
+  {t:"Quick shower or wipe-down, fresh shirt, deodorant",s:2,e:"Clean and confident. That’s a mental health win too."},
+  {t:"Spray extra body spray over the sweat",s:1,e:"Covering the smell doesn’t remove the bacteria causing it."},
+  {t:"Go as you are. Nobody will notice",s:0,e:"They probably will. A 5-minute refresh makes a big difference."}]},
+ {img:"img/screensoff.jpg",alt:"Teen winding down with screens off before bed",t:"It’s midnight. You have a test tomorrow and you’re still scrolling.",o:[
+  {t:"Put the phone across the room and go to sleep",s:2,e:"Sleep is when your brain saves what you studied."},
+  {t:"Watch one more video, then sleep",s:1,e:"“One more” usually turns into ten."},
+  {t:"Grab an energy drink and cram until 3 a.m.",s:0,e:"Less sleep means worse focus and memory on test day."}]},
+ {img:"img/socialmedia.jpg",alt:"Teen looking at social media on a phone",t:"Your group chat starts posting mean memes about a classmate.",o:[
+  {t:"Don’t join in, screenshot it, and tell a trusted adult or report it",s:2,e:"Standing up quietly still counts. Check in on your classmate too."},
+  {t:"Leave the chat without saying anything",s:1,e:"Better than joining, but the bullying keeps going."},
+  {t:"Send a laughing reaction so you fit in",s:0,e:"Cyberbullying is never okay, even as a joke."}]},
+ {img:"img/feelings.jpg",alt:"Comic of a teen feeling jealous, then talking to a friend",t:"You see your best friend hanging out with a new group, and you feel jealous.",o:[
+  {t:"Notice the feeling and talk to your friend about it calmly",s:2,e:"Naming the feeling takes away a lot of its power."},
+  {t:"Vent to another friend you trust",s:1,e:"Talking helps. Try talking to your best friend too."},
+  {t:"Post a vague, shady story about them",s:0,e:"That usually makes things worse for everyone."}]},
+ {img:null,t:"At a party, someone hands you a vape and says, “Everyone’s doing it.”",o:[
+  {t:"“I’m good, thanks,” and change the subject or step away",s:2,e:"A clear, easy no. You don’t owe anyone a reason."},
+  {t:"Take it but don’t actually use it",s:1,e:"Holding it often leads to more pressure. A clear no is easier."},
+  {t:"Try it so they stop asking",s:0,e:"Nicotine is addictive, and real friends don’t push."}]},
+ {img:"img/diversity.jpg",alt:"People holding hands around a heart",t:"A friend texts you: “I can’t do this anymore. Nobody would even care.”",o:[
+  {t:"Tell them you care, stay with them, and get a trusted adult or call or text 988 together",s:2,e:"Exactly right. You don’t have to handle it alone."},
+  {t:"Tell them to cheer up and that things will be fine",s:1,e:"Kind, but they need real support. Bring in a trusted adult or 988."},
+  {t:"Keep it secret because they asked you to",s:0,e:"Their safety matters more than a secret. Tell a trusted adult right away."}]}
+];
+const ROUNDS=[
+ {key:"sort",name:"Habit Sort",img:"img/facewash.jpg",alt:"Teen washing his face",desc:"Is it a healthy habit or not? Tap fast. Quicker answers score more.",n:10,sec:8},
+ {key:"myth",name:"Myth or Fact",img:"img/sleep.jpg",alt:"Teen sleeping peacefully",desc:"Bust the myths. Some of these sound true but aren’t.",n:7,sec:10},
+ {key:"scen",name:"What Would You Do?",img:"img/feelings.jpg",alt:"Teen talking to a trusted friend",desc:"Real-life situations. Pick the best move. There’s no timer, so think it through.",n:6,sec:0}
+];
+const URL_SHARE="https://olusegunbankolemd-collab.github.io/teen-health-quiz/game/";
+
+/* ---------- State ---------- */
+let S={};
+const $=id=>document.getElementById(id);
+const stage=$('stage');
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+const calm=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
+const toTop=()=>window.scrollTo(0,0);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ---------- Sound (WebAudio, starts after a tap) ---------- */
+let soundOn=true,actx=null;
+try{soundOn=localStorage.getItem('lvlup-sound')!=='off'}catch(e){}
+function paintSound(){$('soundBtn').textContent=soundOn?'♪':'×';$('soundBtn').setAttribute('aria-label',soundOn?'Sound on, tap to mute':'Sound off, tap to unmute')}
+$('soundBtn').onclick=()=>{soundOn=!soundOn;try{localStorage.setItem('lvlup-sound',soundOn?'on':'off')}catch(e){}paintSound();if(soundOn)beep('good')};
+function beep(kind){
+  if(!soundOn)return;
+  try{
+    actx=actx||new (window.AudioContext||window.webkitAudioContext)();
+    const notes={good:[[660,0],[880,.09]],mid:[[520,0],[600,.1]],bad:[[220,0],[160,.12]],tick:[[900,0]],win:[[523,0],[659,.12],[784,.24],[1047,.38]]}[kind];
+    notes.forEach(([f,t])=>{const o=actx.createOscillator(),g=actx.createGain();o.type=kind==='bad'?'sawtooth':'triangle';o.frequency.value=f;
+      const st=actx.currentTime+t;g.gain.setValueAtTime(0.0001,st);g.gain.exponentialRampToValueAtTime(kind==='bad'?0.05:0.12,st+.02);g.gain.exponentialRampToValueAtTime(0.0001,st+.22);
+      o.connect(g).connect(actx.destination);o.start(st);o.stop(st+.25)});
+  }catch(e){}
+}
+const buzz=ms=>{try{navigator.vibrate&&navigator.vibrate(ms)}catch(e){}};
+
+/* ---------- Confetti ---------- */
+const cv=$('confetti'),cx=cv.getContext('2d');
+const COLORS=['#F08484','#8EA3D6','#B7E0F0','#3D4470','#FFD166','#7FD8B2'];
+let parts=[],raf=0;
+function sizeCanvas(){const d=devicePixelRatio||1;cv.width=innerWidth*d;cv.height=innerHeight*d;cx.setTransform(d,0,0,d,0,0)}
+addEventListener('resize',sizeCanvas);sizeCanvas();
+function confetti(n,ox,oy,spread){
+  if(calm())return;
+  for(let k=0;k<n;k++){const a=-Math.PI/2+(Math.random()-.5)*spread,s=6+Math.random()*9;
+    parts.push({x:ox,y:oy,vx:Math.cos(a)*s,vy:Math.sin(a)*s,g:.22+Math.random()*.12,w:6+Math.random()*7,h:4+Math.random()*6,r:Math.random()*6.28,vr:(Math.random()-.5)*.35,c:COLORS[k%COLORS.length],round:Math.random()<.3,life:0})}
+  if(!raf)raf=requestAnimationFrame(tick);
+}
+function tick(){
+  cx.clearRect(0,0,innerWidth,innerHeight);
+  parts=parts.filter(p=>p.y<innerHeight+40&&p.life<260);
+  for(const p of parts){p.life++;p.vx*=.985;p.vy=p.vy*.985+p.g;p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;
+    cx.save();cx.translate(p.x,p.y);cx.rotate(p.r);cx.fillStyle=p.c;cx.globalAlpha=p.life>200?Math.max(0,(260-p.life)/60):1;
+    if(p.round){cx.beginPath();cx.arc(0,0,p.w/2.4,0,6.28);cx.fill()}else cx.fillRect(-p.w/2,-p.h/2,p.w,p.h*Math.abs(Math.cos(p.r*1.7))+1);cx.restore()}
+  raf=parts.length?requestAnimationFrame(tick):0;
+}
+const center=el=>{const b=el.getBoundingClientRect();return[b.left+b.width/2,b.top+b.height/2]};
+
+/* ---------- Timer ---------- */
+let tRaf=0,tEnd=0,tDur=0,tCb=null,tLastSec=99;
+function startTimer(sec,cb){
+  stopTimer();if(!sec)return;tDur=sec*1000;tEnd=performance.now()+tDur;tCb=cb;tLastSec=99;
+  const bar=$('tbar');
+  const step=now=>{const left=Math.max(0,tEnd-now),f=left/tDur;
+    if(bar){bar.firstElementChild.style.transform=`scaleX(${f})`;bar.classList.toggle('low',f<.3)}
+    const s=Math.ceil(left/1000);if(s<=3&&s<tLastSec&&s>0)beep('tick');tLastSec=s;
+    if(left<=0){tRaf=0;const c=tCb;tCb=null;c&&c();return}
+    tRaf=requestAnimationFrame(step)};
+  tRaf=requestAnimationFrame(step);
+}
+function stopTimer(){if(tRaf)cancelAnimationFrame(tRaf);tRaf=0;tCb=null}
+const timeLeft=()=>tDur?Math.max(0,(tEnd-performance.now())/tDur):0;
+
+/* ---------- HUD ---------- */
+function hud(){
+  $('scorePill').textContent=S.score.toLocaleString();
+  const sp=$('streakPill');sp.hidden=S.streak<3||S.done;sp.textContent=`Streak ×${S.streak}`;
+}
+function bumpScore(){const p=$('scorePill');p.classList.remove('bump');void p.offsetWidth;p.classList.add('bump')}
+const mult=()=>S.streak>=5?2:S.streak>=3?1.5:1;
+function award(base,card){
+  const pts=Math.round(base*mult());S.score+=pts;hud();bumpScore();
+  const f=document.createElement('div');f.className='float';f.textContent=`+${pts}`;card.appendChild(f);setTimeout(()=>f.remove(),1100);
+  return pts;
+}
+function burst(card,text,kind){
+  const b=document.createElement('div');b.className=`burst ${kind}`;b.setAttribute('aria-hidden','true');b.textContent=text;
+  card.appendChild(b);requestAnimationFrame(()=>b.classList.add('go'));setTimeout(()=>b.remove(),1200);
+}
+const HYPE=['Correct!','Nice!','Boom!','Yes!','On fire!','Nailed it!'];
+const hype=()=>S.streak>=5?'On fire!':HYPE[Math.random()*4|0];
+
+/* ---------- Screens ---------- */
+function startScreen(){
+  $('bar').hidden=true;stopTimer();toTop();
+  stage.innerHTML=`<section class="card navy">
+    <p class="eyebrow">Taking Charge of Your Health</p>
+    <h1>Level Up</h1>
+    <p class="lead">The health challenge. Three quick rounds. How high can you score?</p>
+    <ol class="rounds">${ROUNDS.map((r,k)=>`<li><span class="n">${k+1}</span><span>${r.name}</span></li>`).join('')}</ol>
+    <p class="muted">Build a streak of 3 for ×1.5 points and 5 for ×2.</p>
+    <div class="field"><label for="nick">Your nickname (optional)</label><input id="nick" maxlength="16" autocomplete="off" placeholder="e.g. Jay"></div>
+    <button class="big" id="btn-start">Start the game</button>
+  </section>`;
+  $('btn-start').onclick=()=>{
+    S={nick:($('nick').value||'').trim().slice(0,16),score:0,streak:0,best:0,acc:0,total:0,right:0,round:0,
+       q:{sort:shuffle(SORT).slice(0,ROUNDS[0].n),myth:shuffle(MYTH).slice(0,ROUNDS[1].n),scen:SCEN.map(s=>({...s,o:shuffle(s.o)}))}};
+    beep('good');$('bar').hidden=false;hud();roundIntro();
+  };
+}
+function roundIntro(){
+  stopTimer();toTop();const r=ROUNDS[S.round];$('roundLabel').textContent=`Round ${S.round+1} of 3`;
+  stage.innerHTML=`<section class="card">
+    <img class="hero-img" src="${r.img}" alt="${esc(r.alt)}">
+    <p class="eyebrow">Round ${S.round+1} of 3</p>
+    <h2>${r.name}</h2>
+    <p class="lead">${r.desc}</p>
+    <p class="muted">${r.n} questions${r.sec?` · ${r.sec} seconds each`:''}</p>
+    <button class="big" id="btn-go">Let’s go</button>
+  </section>`;
+  $('btn-go').onclick=()=>{S.i=0;ask()};$('btn-go').focus({preventScroll:true});
+}
+function ask(){
+  toTop();const r=ROUNDS[S.round],list=S.q[r.key],x=list[S.i];S.locked=false;
+  const meta=`<div class="qmeta"><span>Question ${S.i+1} of ${list.length}</span><span>${r.name}</span></div>`;
+  const timer=r.sec?`<div class="timer" id="tbar"><i></i></div>`:'';
+  if(r.key==='sort'){
+    stage.innerHTML=`<section class="card">${meta}${timer}
+      <p class="habit">${x.t}</p>
+      <div class="choices"><button class="choice yes" id="c-yes">Healthy<small>do it</small></button><button class="choice no" id="c-no">Not healthy<small>skip it</small></button></div>
+      <div id="fbslot"></div></section>`;
+    $('c-yes').onclick=()=>answerSort(true);$('c-no').onclick=()=>answerSort(false);
+    startTimer(r.sec,()=>answerSort(null));
+  }else if(r.key==='myth'){
+    stage.innerHTML=`<section class="card">${meta}${timer}
+      <p class="prompt">${x.t}</p>
+      <div class="choices"><button class="choice yes" id="c-yes">Fact</button><button class="choice no" id="c-no">Myth</button></div>
+      <div id="fbslot"></div></section>`;
+    $('c-yes').onclick=()=>answerMyth(true);$('c-no').onclick=()=>answerMyth(false);
+    startTimer(r.sec,()=>answerMyth(null));
+  }else{
+    stage.innerHTML=`<section class="card">${meta}
+      ${x.img?`<img class="scen-img" src="${x.img}" alt="${esc(x.alt)}">`:''}
+      <p class="prompt">${x.t}</p>
+      <div class="opts">${x.o.map((o,k)=>`<button class="opt" id="o-${k}" data-k="${k}">${o.t}</button>`).join('')}</div>
+      <div id="fbslot"></div></section>`;
+    stage.querySelectorAll('.opt').forEach(b=>b.onclick=()=>answerScen(+b.dataset.k));
+  }
+}
+function feedback(kind,title,text,auto){
+  const card=stage.querySelector('.card');
+  const last=S.i===S.q[ROUNDS[S.round].key].length-1;
+  const label=last?(S.round===2?'See my results':'Next round'):'Next';
+  $('fbslot').outerHTML=`<div class="fb ${kind}"><b>${title}</b><span>${text}</span></div>${auto?'':`<button class="next" id="btn-next">${label}</button>`}`;
+  const go=()=>{if(S.advanced)return;S.advanced=true;next()};S.advanced=false;
+  if(auto){S.autoT=setTimeout(go,auto)}else{const n=$('btn-next');n.onclick=go;n.focus({preventScroll:true})}
+  return card;
+}
+function right(card,base,btn){
+  S.streak++;S.best=Math.max(S.best,S.streak);S.right++;
+  const pts=award(base,card);burst(card,hype(),'good');beep('good');
+  const [ox,oy]=center(btn);confetti(S.streak>=5?110:60,ox,oy,2.2);
+  return pts;
+}
+function wrong(card,timeout){S.streak=0;hud();burst(card,timeout?'Time’s up!':'Oops!','bad');beep('bad');buzz(120);card.classList.add('shake')}
+function lockChoices(pickId){stage.querySelectorAll('.choice').forEach(b=>{b.disabled=true;if(b.id===pickId)b.classList.add('picked')})}
+function answerSort(v){
+  if(S.locked)return;S.locked=true;const f=timeLeft();stopTimer();
+  const x=S.q.sort[S.i],card=stage.querySelector('.card');S.total++;
+  lockChoices(v===null?'':v?'c-yes':'c-no');
+  const ok=v===x.h;
+  if(ok){S.acc++;right(card,100+Math.round(50*f),$(v?'c-yes':'c-no'));feedback('ok',x.h?'Healthy habit':'Not healthy',x.tip,1700)}
+  else{wrong(card,v===null);feedback('no',`It’s ${x.h?'healthy':'not healthy'}`,x.tip,2300)}
+}
+function answerMyth(v){
+  if(S.locked)return;S.locked=true;const f=timeLeft();stopTimer();
+  const x=S.q.myth[S.i],card=stage.querySelector('.card');S.total++;
+  lockChoices(v===null?'':v?'c-yes':'c-no');
+  const ok=v===x.f;
+  if(ok){S.acc++;right(card,100+Math.round(50*f),$(v?'c-yes':'c-no'));feedback('ok',`Correct, it’s a ${x.f?'fact':'myth'}!`,x.e)}
+  else{wrong(card,v===null);feedback('no',v===null?`Time’s up. It’s a ${x.f?'fact':'myth'}.`:`Not quite. It’s a ${x.f?'fact':'myth'}.`,x.e)}
+}
+function answerScen(k){
+  if(S.locked)return;S.locked=true;
+  const x=S.q.scen[S.i],o=x.o[k],card=stage.querySelector('.card');S.total++;
+  stage.querySelectorAll('.opt').forEach((b,j)=>{b.disabled=true;const s=x.o[j].s;if(s===2)b.classList.add('s2');if(j===k){b.classList.add('picked','s'+s)}});
+  if(o.s===2){S.acc++;right(card,150,$('o-'+k));feedback('ok','Best move!',o.e)}
+  else if(o.s===1){S.acc+=.5;S.streak=0;award(50,card);beep('mid');feedback('mid','Okay, but there’s a better move',o.e+' The best answer is highlighted in green.')}
+  else{wrong(card,false);feedback('no','Not the best choice',o.e+' The best answer is highlighted in green.')}
+}
+function next(){
+  clearTimeout(S.autoT);
+  const list=S.q[ROUNDS[S.round].key];
+  if(S.i<list.length-1){S.i++;ask()}
+  else if(S.round<2){S.round++;roundIntro()}
+  else finish();
+}
+
+/* ---------- Results ---------- */
+function badge(kind){
+  if(kind==='gold')return `<svg viewBox="0 0 200 210" role="img" aria-label="Gold trophy">
+   <defs><linearGradient id="g1" x1="0" x2="1"><stop offset="0" stop-color="#F6B93B"/><stop offset=".5" stop-color="#FFE08A"/><stop offset="1" stop-color="#E89A1C"/></linearGradient>
+   <linearGradient id="g2" x1="0" x2="1"><stop offset="0" stop-color="#D98A12"/><stop offset="1" stop-color="#F6B93B"/></linearGradient></defs>
+   <path d="M52 40 C14 40 14 98 62 104" fill="none" stroke="url(#g2)" stroke-width="12" stroke-linecap="round"/>
+   <path d="M148 40 C186 40 186 98 138 104" fill="none" stroke="url(#g2)" stroke-width="12" stroke-linecap="round"/>
+   <path d="M48 26 H152 V62 C152 98 128 122 100 122 C72 122 48 98 48 62 Z" fill="url(#g1)"/>
+   <rect x="90" y="120" width="20" height="26" rx="4" fill="url(#g2)"/><rect x="64" y="144" width="72" height="14" rx="5" fill="url(#g1)"/>
+   <rect x="52" y="158" width="96" height="34" rx="8" fill="#3D4470"/>
+   <text x="100" y="181" text-anchor="middle" font-family="Lilita One, Arial Rounded MT Bold, sans-serif" font-size="16" fill="#FFE08A" letter-spacing="1">CHAMPION</text>
+   <path d="M100 48 l7 14 15 2 -11 10 3 15 -14 -7 -14 7 3 -15 -11 -10 15 -2z" fill="#FFF7D6"/>
+   <path class="spark" d="M24 18 l3 8 8 3 -8 3 -3 8 -3 -8 -8 -3 8 -3z" fill="#F08484"/>
+   <path class="spark s2" d="M176 12 l3 8 8 3 -8 3 -3 8 -3 -8 -8 -3 8 -3z" fill="#8EA3D6"/>
+   <path class="spark s3" d="M182 130 l2.5 6 6 2.5 -6 2.5 -2.5 6 -2.5 -6 -6 -2.5 6 -2.5z" fill="#FFD166"/></svg>`;
+  const c={silver:['#B8C2D9','#EEF2FA','#8C97B3'],bronze:['#D08A55','#F4C79E','#A86434'],blue:['#8EA3D6','#C9D6F5','#6C80B8']}[kind];
+  return `<svg viewBox="0 0 200 210" role="img" aria-label="${kind} medal">
+   <defs><linearGradient id="m1" x1="0" x2="1"><stop offset="0" stop-color="${c[0]}"/><stop offset=".5" stop-color="${c[1]}"/><stop offset="1" stop-color="${c[2]}"/></linearGradient></defs>
+   <path d="M66 10 L100 80 L80 90 L46 20Z" fill="#F08484"/><path d="M134 10 L100 80 L120 90 L154 20Z" fill="#3D4470"/>
+   <circle cx="100" cy="132" r="62" fill="url(#m1)"/><circle cx="100" cy="132" r="48" fill="none" stroke="#FFFFFF" stroke-opacity=".6" stroke-width="4"/>
+   <path d="M100 100 l9 19 20 3 -15 14 4 20 -18 -10 -18 10 4 -20 -15 -14 20 -3z" fill="#FFFFFF" fill-opacity=".9"/>
+   <path class="spark" d="M30 70 l3 8 8 3 -8 3 -3 8 -3 -8 -8 -3 8 -3z" fill="#FFD166"/>
+   <path class="spark s2" d="M172 96 l3 8 8 3 -8 3 -3 8 -3 -8 -8 -3 8 -3z" fill="#8EA3D6"/></svg>`;
+}
+function finish(){
+  stopTimer();toTop();$('roundLabel').textContent='Results';S.done=true;$('streakPill').hidden=true;
+  const pct=S.acc/S.total;
+  const R=pct>=.85?{k:'gold',t:'Health Hero',m:'You know how to take care of your body and your mind.'}
+         :pct>=.65?{k:'silver',t:'Wellness Warrior',m:'Strong game. A few more and you’re a Health Hero.'}
+         :pct>=.4?{k:'bronze',t:'Rising Star',m:'Good start. Play again to level up.'}
+         :{k:'blue',t:'Rookie',m:'Everyone starts somewhere. Try again. You’ve got this.'};
+  const name=S.nick?`${esc(S.nick)}, you’re a`:'You’re a';
+  stage.innerHTML=`<section class="card">
+    <div class="rank">${badge(R.k)}<p class="eyebrow">${name}</p><h2>${R.t}</h2><p class="lead">${R.m}</p></div>
+    <p class="final-score" style="text-align:center">${S.score.toLocaleString()}<span class="muted" style="font-size:.35em;font-family:var(--body);font-weight:700"> pts</span></p>
+    <div class="stats"><div class="stat"><b>${S.right}/${S.total}</b><span>Best answers</span></div><div class="stat"><b>${Math.round(pct*100)}%</b><span>Accuracy</span></div><div class="stat"><b>${S.best}</b><span>Best streak</span></div></div>
+    <p class="muted" style="text-align:center;font-weight:700">Hold up your screen when your presenter asks!</p>
+    <div class="row"><button class="big" id="btn-again">Play again</button><button class="big alt" id="btn-share">Copy my score</button></div>
+    <p class="toast" id="toast" role="status"></p>
+    <div class="help">Need to talk? Call or text <strong>988</strong> any time, free and confidential. NYC teens 13–17 can get free online therapy through <strong>NYC Teenspace</strong> (nyc.gov/teenspace).</div>
+  </section>`;
+  $('btn-again').onclick=startScreen;
+  $('btn-share').onclick=async()=>{
+    const txt=`I scored ${S.score.toLocaleString()} and ranked ${R.t} in Level Up: Health Challenge! Can you beat me? ${URL_SHARE}`;
+    try{await navigator.clipboard.writeText(txt);$('toast').textContent='Copied! Paste it to your friends.'}
+    catch(e){$('toast').textContent=txt}
+  };
+  if(R.k==='gold'||R.k==='silver'){
+    beep('win');const w=innerWidth;
+    confetti(150,w*.15,innerHeight*.9,1.1);confetti(150,w*.85,innerHeight*.9,1.1);
+    setTimeout(()=>{const t=stage.querySelector('.rank svg');if(t){const [ox,oy]=center(t);confetti(130,ox,oy,6.28)}},700);
+  }else{beep('mid');const t=stage.querySelector('.rank svg');if(t){const [ox,oy]=center(t);confetti(60,ox,oy,6.28)}}
+}
+
+paintSound();startScreen();
+</script>
+</body>
+</html>

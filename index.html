@@ -205,7 +205,8 @@ function done(){
     <p class="score">${score} / ${Q.length}</p>
     <p class="msg">${won?m:m+` Get ${WIN} or more right to win the trophy!`}</p>
     <div class="help">Need to talk? Call or text <strong>988</strong> any time. NYC teens 13–17 can also get free online therapy through <strong>NYC Teenspace</strong> (nyc.gov/teenspace).</div>
-    <button class="next" id="btn-again" style="justify-self:center">Try again</button></section>`;
+    <button class="next" id="btn-again" style="justify-self:center">Try again</button>
+    <a class="next" href="game/" style="text-align:center;text-decoration:none;background:var(--coral);color:var(--coral-ink)">Play the Level Up game</a></section>`;
   document.getElementById('btn-again').onclick=()=>{i=0;score=0;show()};
   if(won){
     const w=innerWidth;
